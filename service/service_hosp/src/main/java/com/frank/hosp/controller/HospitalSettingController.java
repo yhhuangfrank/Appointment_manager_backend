@@ -7,7 +7,6 @@ import com.frank.hosp.service.HospitalSettingService;
 import com.frank.model.HospitalSetting;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,11 +29,6 @@ public class HospitalSettingController {
     public Result<SearchResponse<HospitalSetting>> search(@PathVariable(value = "page", required = false) Integer pageNum,
                                          @PathVariable(value = "limit", required = false) Integer pageSize,
                                          @RequestBody(required = false) SearchRequest request) {
-        if (request != null) {
-            System.out.println(request.getHosName());
-            System.out.println(request.getHosCode());
-        }
-
         return Result.ok(hospitalSettingService.findAllByPage(pageNum, pageSize, request));
     }
 

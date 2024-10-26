@@ -42,7 +42,7 @@ public class HospitalSettingService {
         int size = pageSize == null ? 10 : pageSize;
         String baseSql = """
                     FROM HospitalSetting h
-                    WHERE 1=1
+                    WHERE h.isDeleted = 0
                 """;
         StringBuilder countSqlString =  new StringBuilder("SELECT COUNT(*) " + baseSql);
         StringBuilder sqlString = new StringBuilder(baseSql);
