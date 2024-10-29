@@ -54,4 +54,10 @@ public class HospitalSettingController {
         hospitalSettingService.update(hospitalSetting);
         return Result.ok();
     }
+
+    @PutMapping("/update/{id}/{status}")
+    public Result<?> updateStatus(@PathVariable("id") Long id, @PathVariable("status") Integer status) {
+        hospitalSettingService.updateStatusById(id, status);
+        return Result.ok();
+    }
 }

@@ -44,7 +44,7 @@ public class HospitalSettingService {
                     FROM HospitalSetting h
                     WHERE h.isDeleted = 0
                 """;
-        StringBuilder countSqlString =  new StringBuilder("SELECT COUNT(*) " + baseSql);
+        StringBuilder countSqlString = new StringBuilder("SELECT COUNT(*) " + baseSql);
         StringBuilder sqlString = new StringBuilder(baseSql);
 
         if (request != null && StringUtils.isNotBlank(request.getHosName())) {
@@ -95,5 +95,13 @@ public class HospitalSettingService {
                             hospitalSettingRepository.save(h);
                         }
                 );
+    }
+
+    public void updateStatusById(Long id, Integer status) {
+        hospitalSettingRepository.findById(id)
+                .ifPresent(h -> {
+                    h.setStatus(status);
+                    hospitalSettingRepository.save(h);
+                });
     }
 }
