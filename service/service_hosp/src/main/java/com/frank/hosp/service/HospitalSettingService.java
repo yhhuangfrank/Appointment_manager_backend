@@ -30,11 +30,12 @@ public class HospitalSettingService {
 
     // soft delete
     public void deleteById(Long id) {
-        HospitalSetting hospitalSetting = hospitalSettingRepository.findById(id).orElse(null);
-        if (hospitalSetting != null) {
-            hospitalSetting.setIsDeleted(1);
-            hospitalSettingRepository.save(hospitalSetting);
-        }
+        hospitalSettingRepository
+                .findById(id)
+                .ifPresent(h -> {
+                    h.setIsDeleted(1);
+                    hospitalSettingRepository.save(h);
+                });
     }
 
     public SearchResponse<HospitalSetting> findAllByPage(Integer pageNum, Integer pageSize, SearchRequest request) {
