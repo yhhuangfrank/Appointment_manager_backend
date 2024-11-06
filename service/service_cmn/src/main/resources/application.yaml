@@ -1,0 +1,23 @@
+server:
+  port: 8202
+spring:
+  application:
+    name: service-cmn
+  profiles:
+    active: dev
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      fail-on-empty-beans: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/common
+    username: root
+    password: password
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
