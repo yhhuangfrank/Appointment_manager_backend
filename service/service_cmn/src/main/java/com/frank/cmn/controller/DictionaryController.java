@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping("/admin/cmn/dict")
 @RequiredArgsConstructor
 @CrossOrigin
-public class DictController {
+public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
