@@ -32,4 +32,10 @@ spring:
           max-wait: -1
           max-idle: 5
           min-idle: 0
-
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}

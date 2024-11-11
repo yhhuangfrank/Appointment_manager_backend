@@ -22,4 +22,12 @@ spring:
     open-in-view: false
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/test
+      uri: mongodb://127.0.0.1:27018/test
+      auto-index-creation: true
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}
