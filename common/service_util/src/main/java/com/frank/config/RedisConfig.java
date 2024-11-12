@@ -1,4 +1,4 @@
-package com.frank.cmn.config;
+package com.frank.config;
 
 
 import org.springframework.cache.CacheManager;

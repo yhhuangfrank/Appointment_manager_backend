@@ -1,20 +1,24 @@
 package com.frank.hosp.service;
 
+import com.frank.config.DictionaryFeignClient;
 import com.frank.hosp.dto.HospitalQuery;
 import com.frank.hosp.repository.HospitalRepository;
 import com.frank.model.Hospital;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
+    private final DictionaryFeignClient dictionaryFeignClient;
 
     public void save(Hospital request) {
         Hospital hospital = hospitalRepository.getHospitalByHosCode(request.getHosCode());
@@ -32,17 +36,32 @@ public class HospitalService {
     }
 
     public Page<Hospital> findHosByPage(int page, int limit, HospitalQuery query) {
+        Page<Hospital> hospitals;
         Pageable pageable = PageRequest.of(page - 1, limit);
         if (query == null) {
-            return hospitalRepository.findAll(pageable);
+            hospitals = hospitalRepository.findAll(pageable);
+        } else {
+            Hospital hospital = new Hospital();
+            BeanUtils.copyProperties(query, hospital);
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                    .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                    .withIgnoreCase(true);
+            Example<Hospital> example = Example.of(hospital, matcher);
+            hospitals = hospitalRepository.findAll(example, pageable);
         }
-        Hospital hospital = new Hospital();
-        BeanUtils.copyProperties(query, hospital);
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-                .withIgnoreCase(true);
-        Example<Hospital> example = Example.of(hospital, matcher);
-        return hospitalRepository.findAll(example, pageable);
+        hospitals.getContent().forEach(this::setLevel);
+        return hospitals;
+    }
+
+    private void setLevel(Hospital h) {
+        String level;
+        try {
+            level = dictionaryFeignClient.findName(h.getDictCode()).getData();
+        } catch (Exception e) {
+            log.error("dictionaryFeignClient error.", e);
+            level = "";
+        }
+        h.setLevel(level);
     }
 
     public void updateStatusById(String id, Integer status) {

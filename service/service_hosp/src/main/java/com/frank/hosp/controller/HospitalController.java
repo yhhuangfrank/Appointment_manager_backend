@@ -1,48 +1,50 @@
 package com.frank.hosp.controller;
 
 import com.frank.common.Result;
-import com.frank.hosp.dto.ScheduleDeleteRequest;
-import com.frank.hosp.dto.ScheduleQuery;
+import com.frank.hosp.dto.HospitalQuery;
 import com.frank.hosp.service.HospitalService;
-import com.frank.hosp.service.ScheduleService;
 import com.frank.model.Hospital;
-import com.frank.model.Schedule;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/hosp")
+@RequestMapping("/admin/hospitals")
+@CrossOrigin
 public class HospitalController {
 
     private final HospitalService hospitalService;
-    private final ScheduleService scheduleService;
 
-    @PostMapping("/saveHospital")
-    public Result<?> saveHosp(@RequestBody Hospital request) {
-        hospitalService.save(request);
+    @PostMapping("/search/{page}/{limit}")
+    public Result<Page<Hospital>> findHosByPage(@PathVariable("page") int page,
+                                                @PathVariable("limit") int limit,
+                                                @RequestBody(required = false) HospitalQuery query) {
+        return Result.ok(hospitalService.findHosByPage(page, limit, query));
+    }
+
+    @PostMapping("/")
+    public Result<?> add(@RequestBody Hospital hospital) {
+        hospitalService.save(hospital);
         return Result.ok();
     }
 
-    @PostMapping("/saveSchedule")
-    public Result<?> saveSchedule(@RequestBody List<Schedule> requests) {
-        scheduleService.save(requests);
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable("id") String id) {
+        hospitalService.deleteById(id);
         return Result.ok();
     }
 
-    @PostMapping("/schedule/list")
-    public Result<List<Schedule>> findSchedule(@RequestBody ScheduleQuery query) {
-        return Result.ok(scheduleService.findSchedule(query));
+    @GetMapping("/{id}")
+    public Result<Hospital> findById(@PathVariable("id") String id) {
+        return Result.ok(hospitalService.findById(id));
     }
 
-    @PostMapping("/schedule/remove")
-    public Result<?> removeSchedule(@RequestBody ScheduleDeleteRequest request) {
-        scheduleService.removeSchedule(request);
+    @PutMapping("/update/{id}/{status}")
+    public Result<?> updateStatus(@PathVariable("id") String id, @PathVariable("status") Integer status) {
+        hospitalService.updateStatusById(id, status);
         return Result.ok();
     }
 }

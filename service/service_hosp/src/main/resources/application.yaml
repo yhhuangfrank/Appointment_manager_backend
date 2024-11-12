@@ -31,3 +31,19 @@ spring:
       discovery:
         prefer-ip-address: true
         service-name: ${spring.application.name}
+    openfeign:
+      client:
+        config:
+          service-cmn:
+            connect-timeout: 20000
+            read-timeout: 20000
+      httpclient:
+        hc5:
+          enabled: true
+      compression:
+        request:
+          enabled: true
+          mime-types: text/xml, application/xml, application/json
+          min-request-size: 2048
+        response:
+          enabled: true
