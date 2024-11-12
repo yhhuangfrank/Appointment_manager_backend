@@ -1,14 +1,18 @@
 package com.frank.model;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.Date;
 
-@Document
 @Data
-public class Hospital {
+@Document("Hospital")
+public class Hospital implements Serializable {
+    @Id
+    private String id;
 
     @Indexed
     private String hosName;
@@ -16,7 +20,9 @@ public class Hospital {
     @Indexed(unique = true)
     private String hosCode;
 
-    private String hosType;
+    private Long dictCode;
+
+    private String level;
 
     private String address;
 

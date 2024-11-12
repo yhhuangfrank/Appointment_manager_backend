@@ -16,9 +16,14 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
-    @GetMapping("/getChildrenData/{id}")
+    @GetMapping("/findChildrenData/{id}")
     public Result<List<Dictionary>> getChildrenData(@PathVariable("id") Long id) {
         List<Dictionary> dictionaries =  dictionaryService.getChildrenData(id);
         return Result.ok(dictionaries);
+    }
+
+    @GetMapping("/findName/{id}")
+    public Result<String> getName(@PathVariable("id") Long dictCode) {
+        return Result.ok(dictionaryService.getName(dictCode));
     }
 }
