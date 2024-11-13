@@ -11,6 +11,10 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,5 +84,14 @@ public class HospitalService {
 
     public Hospital findById(String id) {
         return hospitalRepository.findById(id).orElse(null);
+    }
+
+    public List<Map<String, String>> findAllName() {
+        return hospitalRepository.findAll().stream().map(h -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("id", h.getId());
+            map.put("hosName", h.getHosName());
+            return map;
+        }).toList();
     }
 }

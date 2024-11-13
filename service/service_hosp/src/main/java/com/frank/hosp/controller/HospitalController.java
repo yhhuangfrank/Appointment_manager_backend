@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -46,5 +49,10 @@ public class HospitalController {
     public Result<?> updateStatus(@PathVariable("id") String id, @PathVariable("status") Integer status) {
         hospitalService.updateStatusById(id, status);
         return Result.ok();
+    }
+
+    @GetMapping("/all/names")
+    public Result<List<Map<String, String>>> getAllNames() {
+        return Result.ok(hospitalService.findAllName());
     }
 }
