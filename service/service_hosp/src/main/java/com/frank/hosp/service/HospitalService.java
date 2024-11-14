@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -89,7 +88,7 @@ public class HospitalService {
     public List<Map<String, String>> findAllName() {
         return hospitalRepository.findAll().stream().map(h -> {
             Map<String, String> map = new HashMap<>();
-            map.put("id", h.getId());
+            map.put("hosCode", h.getHosCode());
             map.put("hosName", h.getHosName());
             return map;
         }).toList();
