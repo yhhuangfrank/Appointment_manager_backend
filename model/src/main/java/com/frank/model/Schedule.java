@@ -1,5 +1,6 @@
 package com.frank.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,9 +23,10 @@ public class Schedule {
 
     private Integer availableCount;
 
-    private String workDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date workDate;
 
-    private String workTime;
+    private Integer workTime;
 
     private Date createTime;
 
