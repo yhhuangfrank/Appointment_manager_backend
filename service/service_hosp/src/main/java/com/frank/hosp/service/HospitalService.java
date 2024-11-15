@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,6 +24,7 @@ public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
     private final DictionaryFeignClient dictionaryFeignClient;
+    private final MongoTemplate mongoTemplate;
 
     public void save(Hospital request) {
         hospitalRepository.findById(request.getId())
@@ -87,7 +90,9 @@ public class HospitalService {
     }
 
     public List<Map<String, String>> findAllName() {
-        return hospitalRepository.findAll().stream().map(h -> {
+        Query query = new Query();
+        query.fields().include("hosCode", "hosName").exclude("id");
+        return mongoTemplate.find(query, Hospital.class).stream().map(h -> {
             Map<String, String> map = new HashMap<>();
             map.put("hosCode", h.getHosCode());
             map.put("hosName", h.getHosName());
