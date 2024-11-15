@@ -15,8 +15,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/hospitals")
-@CrossOrigin
+@RequestMapping("/admin/hosp")
 public class HospitalController {
 
     private final HospitalService hospitalService;

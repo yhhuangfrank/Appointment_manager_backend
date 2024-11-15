@@ -1,0 +1,20 @@
+server:
+  port: 80
+spring:
+  application:
+    name: gateway
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+        service-name: ${spring.application.name}
+    gateway:
+      routes:
+        - id: service-cmn
+          uri: lb://service-cmn
+          predicates: Path=/*/cmn/**
+        - id: service-hosp
+          uri: lb://service-hosp
+          predicates: Path=/*/hosp/**

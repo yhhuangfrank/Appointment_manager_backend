@@ -12,7 +12,6 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/hosp/schedule")
-@CrossOrigin
 public class ScheduleController {
 
     private final ScheduleService scheduleService;

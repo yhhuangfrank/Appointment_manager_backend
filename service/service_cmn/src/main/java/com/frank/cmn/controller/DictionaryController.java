@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/cmn/dict")
 @RequiredArgsConstructor
-@CrossOrigin
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
