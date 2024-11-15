@@ -1,6 +1,7 @@
 package com.frank.hosp.service;
 
 import com.frank.hosp.dto.ScheduleDeleteRequest;
+import com.frank.hosp.dto.ScheduleDetail;
 import com.frank.hosp.dto.ScheduleQuery;
 import com.frank.hosp.dto.ScheduleRule;
 import com.frank.hosp.repository.HospitalRepository;
@@ -8,6 +9,7 @@ import com.frank.hosp.repository.ScheduleRepository;
 import com.frank.model.Hospital;
 import com.frank.model.Schedule;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -19,14 +21,14 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -107,5 +109,28 @@ public class ScheduleService {
         result.put("total", total);
         result.put("hosName", hospital.getHosName());
         return result;
+    }
+
+    public List<ScheduleDetail> getScheduleDetail(String hosCode, String workDate) {
+        List<ScheduleDetail> res;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date parse = format.parse(workDate);
+            List<Schedule> scheduleList = scheduleRepository.findByHosCodeAndWorkDate(hosCode, parse);
+            res = scheduleList.stream().map(this::transToScheduleDetail).toList();
+        } catch (ParseException e) {
+            log.error("workDate parse error.", e);
+            res = new ArrayList<>();
+        }
+        return res;
+    }
+
+    private ScheduleDetail transToScheduleDetail(Schedule schedule) {
+        ScheduleDetail detail = new ScheduleDetail();
+        BeanUtils.copyProperties(schedule, detail);
+        detail.setHosName(hospitalRepository.getHospitalByHosCode(schedule.getHosCode()).getHosName());
+        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochSecond(schedule.getWorkDate().getTime() / 1000), ZoneId.systemDefault());
+        detail.setDayOfWeek(localDate.getDayOfWeek().name());
+        return detail;
     }
 }
