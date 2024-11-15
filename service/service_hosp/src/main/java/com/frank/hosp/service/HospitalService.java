@@ -24,18 +24,19 @@ public class HospitalService {
     private final DictionaryFeignClient dictionaryFeignClient;
 
     public void save(Hospital request) {
-        Hospital hospital = hospitalRepository.getHospitalByHosCode(request.getHosCode());
-
-        if (hospital != null) {
-            hospital.setUpdateTime(new Date());
-            hospitalRepository.save(hospital);
-        } else {
-            request.setStatus(0);
-            request.setCreateTime(new Date());
-            request.setUpdateTime(new Date());
-            request.setIsDeleted(0);
-            hospitalRepository.save(request);
-        }
+        hospitalRepository.findById(request.getId())
+                .ifPresentOrElse(h -> {
+                    h.setUpdateTime(new Date());
+                    h.setDictCode(request.getDictCode());
+                    h.setHosName(request.getHosName());
+                    hospitalRepository.save(h);
+                }, () -> {
+                    request.setStatus(0);
+                    request.setCreateTime(new Date());
+                    request.setUpdateTime(new Date());
+                    request.setIsDeleted(0);
+                    hospitalRepository.save(request);
+                });
     }
 
     public Page<Hospital> findHosByPage(int page, int limit, HospitalQuery query) {
