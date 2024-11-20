@@ -10,6 +10,8 @@ public class HospitalQuery {
 
     private String hosCode;
 
+    private Long dictCode;
+
     private String address;
 
     private Integer status;

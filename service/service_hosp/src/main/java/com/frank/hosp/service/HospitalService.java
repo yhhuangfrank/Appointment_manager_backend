@@ -91,12 +91,16 @@ public class HospitalService {
 
     public List<Map<String, String>> findAllName() {
         Query query = new Query();
-        query.fields().include("hosCode", "hosName").exclude("id");
+        query.fields().include("hosCode", "hosName").exclude("_id");
         return mongoTemplate.find(query, Hospital.class).stream().map(h -> {
             Map<String, String> map = new HashMap<>();
             map.put("hosCode", h.getHosCode());
             map.put("hosName", h.getHosName());
             return map;
         }).toList();
+    }
+
+    public List<Hospital> findByHosName(String hosName) {
+        return hospitalRepository.findByHosNameLike(hosName);
     }
 }

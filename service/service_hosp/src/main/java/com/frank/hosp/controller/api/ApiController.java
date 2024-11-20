@@ -1,6 +1,7 @@
 package com.frank.hosp.controller.api;
 
 import com.frank.common.Result;
+import com.frank.hosp.dto.HospitalQuery;
 import com.frank.hosp.dto.ScheduleDeleteRequest;
 import com.frank.hosp.dto.ScheduleQuery;
 import com.frank.hosp.service.HospitalService;
@@ -8,10 +9,8 @@ import com.frank.hosp.service.ScheduleService;
 import com.frank.model.Hospital;
 import com.frank.model.Schedule;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,5 +43,19 @@ public class ApiController {
     public Result<?> removeSchedule(@RequestBody ScheduleDeleteRequest request) {
         scheduleService.removeSchedule(request);
         return Result.ok();
+    }
+
+    @PostMapping("/findHospList/{page}/{limit}")
+    public Result<Page<Hospital>> findHospList(@PathVariable("page") int page,
+                                               @PathVariable("limit") int limit,
+                                               @RequestBody(required = false) HospitalQuery query
+    ) {
+        Page<Hospital> pageObj = hospitalService.findHosByPage(page, limit, query);
+        return Result.ok(pageObj);
+    }
+
+    @GetMapping("/findHospByHosName/{hosName}")
+    public Result<List<Hospital>> findHospByHosName(@PathVariable("hosName") String hosName) {
+        return Result.ok(hospitalService.findByHosName(hosName));
     }
 }
