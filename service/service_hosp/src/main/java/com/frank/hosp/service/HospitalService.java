@@ -86,7 +86,11 @@ public class HospitalService {
     }
 
     public Hospital findById(String id) {
-        return hospitalRepository.findById(id).orElse(null);
+        Hospital hospital = hospitalRepository.findById(id).orElse(null);
+        if (hospital != null) {
+            setLevel(hospital);
+        }
+        return hospital;
     }
 
     public List<Map<String, String>> findAllName() {

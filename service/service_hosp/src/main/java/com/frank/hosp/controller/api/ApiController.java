@@ -54,6 +54,11 @@ public class ApiController {
         return Result.ok(pageObj);
     }
 
+    @GetMapping("/{id}")
+    public Result<Hospital> findById(@PathVariable("id") String id) {
+        return Result.ok(hospitalService.findById(id));
+    }
+
     @GetMapping("/findHospByHosName/{hosName}")
     public Result<List<Hospital>> findHospByHosName(@PathVariable("hosName") String hosName) {
         return Result.ok(hospitalService.findByHosName(hosName));
