@@ -1,4 +1,4 @@
-package com.frank.hosp;
+package com.frank.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,9 +10,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EntityScan("com.frank")
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"com.frank"})
-public class ServiceApplication {
-
+public class ServiceUserApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ServiceApplication.class, args);
+        SpringApplication.run(ServiceUserApplication.class);
     }
 }
