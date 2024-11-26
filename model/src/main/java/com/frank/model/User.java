@@ -30,6 +30,13 @@ public class User {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
+    @Size(max = 100)
+    @Column(name = "auth_no", length = 100)
+    private String authNo;
+
+    @Column(name = "auth_status")
+    private Integer authStatus;
+
     @Column(name = "create_time", nullable = false, insertable = false, updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Instant createTime;

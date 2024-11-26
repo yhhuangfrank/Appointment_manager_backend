@@ -34,6 +34,12 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${io-jsonwebtoken.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.31</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>
