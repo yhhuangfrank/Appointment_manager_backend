@@ -63,4 +63,17 @@ public class ApiController {
     public Result<List<Hospital>> findHospByHosName(@PathVariable("hosName") String hosName) {
         return Result.ok(hospitalService.findByHosName(hosName));
     }
+
+    @GetMapping("/auth/getBookingScheduleRule/{page}/{limit}/{hosCode}")
+    public Result<?> getBookingScheduleRule(@PathVariable("page") Integer page,
+                                            @PathVariable("limit") Integer limit,
+                                            @PathVariable("hosCode") String hosCode) {
+        return Result.ok(scheduleService.getBookingScheduleRule(page, limit, hosCode));
+    }
+
+    @GetMapping("/auth/findScheduleList/{hosCode}/{workDate}")
+    public Result<?> findScheduleList(@PathVariable("hosCode") String hosCode,
+                                      @PathVariable("workDate") String workDate) {
+        return Result.ok(scheduleService.getScheduleDetail(hosCode, workDate));
+    }
 }

@@ -8,25 +8,30 @@ import com.frank.hosp.repository.HospitalRepository;
 import com.frank.hosp.repository.ScheduleRepository;
 import com.frank.model.Hospital;
 import com.frank.model.Schedule;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -132,5 +137,89 @@ public class ScheduleService {
         LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochSecond(schedule.getWorkDate().getTime() / 1000), ZoneId.systemDefault());
         detail.setDayOfWeek(localDate.getDayOfWeek().name());
         return detail;
+    }
+
+    public Map<String, Object> getBookingScheduleRule(Integer page, Integer limit, String hosCode) {
+        Map<String, Object> result = new HashMap<>();
+        Hospital hospital = hospitalRepository.getHospitalByHosCode(hosCode);
+        PagedDate pagedDateList = getListDate(page, limit);
+        Criteria criteria = Criteria.where("hosCode").is(hosCode).and("workDate").in(pagedDateList.getContent());
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.group("workDate").first("workDate").as("workDate")
+                        .count().as("docCount")
+                        .sum("maxCount").as("maxCount")
+                        .sum("availableCount").as("availableCount")
+        );
+        AggregationResults<ScheduleRule> aggregationResults = mongoTemplate.aggregate(aggregation, Schedule.class, ScheduleRule.class);
+        List<ScheduleRule> mappedResults = aggregationResults.getMappedResults();
+        Map<Date, ScheduleRule> scheduleRuleMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(mappedResults)) {
+            scheduleRuleMap = mappedResults.stream().collect(Collectors.toMap(ScheduleRule::getWorkDate, Function.identity()));
+        }
+        List<ScheduleRule> scheduleRuleList = new ArrayList<>();
+        List<Date> dateList = pagedDateList.getContent();
+        for (int i = 0; i < dateList.size(); i++) {
+            Date date = dateList.get(i);
+            ScheduleRule scheduleRule = scheduleRuleMap.get(date);
+            if (scheduleRule == null) {
+                scheduleRule = new ScheduleRule();
+                scheduleRule.setAvailableCount(0);
+                scheduleRule.setDocCount(0);
+            }
+            scheduleRule.setWorkDate(date);
+            LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochSecond(date.getTime() / 1000), ZoneId.systemDefault());
+            scheduleRule.setDayOfWeek(localDate.getDayOfWeek().name());
+
+            if (i == dateList.size() - 1 && page == pagedDateList.getTotalPages()) {
+                scheduleRule.setStatus(0);
+            } else {
+                scheduleRule.setStatus(1);
+            }
+            scheduleRuleList.add(scheduleRule);
+        }
+        result.put("scheduleRuleList", scheduleRuleList);
+        result.put("total", pagedDateList.getTotalElements());
+        result.put("hosName", hospital.getHosName());
+        return result;
+    }
+
+    private PagedDate getListDate(int page, int limit) {
+        String dateString = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime releaseTime = LocalDateTime.parse(dateString.concat(" 08:30"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        int period = 10;
+        if (releaseTime.isBefore(LocalDateTime.now())) {
+            period += 1;
+        }
+        List<Date> dateList = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        for (int i = 0; i < period; i++) {
+            String curDateTime = releaseTime.plusDays(i).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            try {
+                dateList.add(dateFormat.parse(curDateTime));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        List<Date> pageDateList = new ArrayList<>();
+        int start = (page - 1) * limit;
+        int end = (page - 1) * limit + limit;
+        if (end > dateList.size()) {
+            end = dateList.size();
+        }
+        for (int i = start; i < end; i++) {
+            pageDateList.add(dateList.get(i));
+        }
+        int totalPages = (int) Math.ceil((double) dateList.size() / (double) limit);
+        return new PagedDate(pageDateList, dateList.size(), totalPages);
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class PagedDate {
+        private List<Date> content;
+        private int totalElements;
+        private int totalPages;
     }
 }
