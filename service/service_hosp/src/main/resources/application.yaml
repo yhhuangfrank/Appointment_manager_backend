@@ -22,7 +22,7 @@ spring:
     open-in-view: false
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27018/test
+      uri: mongodb://127.0.0.1:27017/test
       auto-index-creation: true
   cloud:
     consul:
